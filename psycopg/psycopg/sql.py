@@ -7,14 +7,14 @@ SQL composition utility module
 import codecs
 import string
 from abc import ABC, abstractmethod
-from typing import Any, Iterator, Iterable, List, Optional, Sequence, Union
+from typing import Any, Iterable, Iterator, List, Optional, Sequence, Union
 
-from .pq import Escaping
-from .abc import AdaptContext
-from ._enums import PyFormat
 from ._compat import LiteralString
 from ._encodings import conn_encoding
+from ._enums import PyFormat
 from ._transformer import Transformer
+from .abc import AdaptContext
+from .pq import Escaping
 
 
 def quote(obj: Any, context: Optional[AdaptContext] = None) -> str:
@@ -209,7 +209,7 @@ class SQL(Composable):
             enc = conn_encoding(context.connection)
         return self._obj.encode(enc)
 
-    def format(self, *args: Any, **kwargs: Any) -> Composed:
+    def format(self, *args: Composable, **kwargs: Composable) -> Composed:
         """
         Merge `Composable` objects into a template.
 
@@ -299,7 +299,7 @@ class SQL(Composable):
             >>> print(snip.as_string(conn))
             "foo", "bar", "baz"
         """
-        rv = []
+        rv: List[Composable] = []
         it = iter(seq)
         try:
             rv.append(next(it))
